@@ -1,0 +1,6 @@
+{
+  "name": "SIPATEN — Aplikasi Pembuatan Konten",
+  "description": "Satu Sumber Kebijakan, Dua Produk Komunikasi Strategis. Aplikasi pembuatan konten berbasis AI Kemenko Polkam.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Compatibility shim for browser extensions & testing interceptors that assign to window.fetch
+      (function() {
+        try {
+          var _origFetch = typeof window.fetch === 'function' ? window.fetch.bind(window) : window.fetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() {
+              return _origFetch;
+            },
+            set: function(newFetch) {
+              _origFetch = newFetch;
+            },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (err) {
+          try {
+            if (typeof Window !== 'undefined' && Window.prototype) {
+              var _protoFetch = Window.prototype.fetch;
+              Object.defineProperty(Window.prototype, 'fetch', {
+                get: function() {
+                  return _protoFetch;
+                },
+                set: function(newFetch) {
+                  _protoFetch = newFetch;
+                },
+                configurable: true,
+                enumerable: true
+              });
+            }
+          } catch (e2) {}
+        }
+
+        // Suppress benign third-party extension injection errors that try to modify immutable properties
+        function isExtensionError(msg, url, err) {
+          var str = (msg || '') + ' ' + (url || '') + ' ' + (err && err.message ? err.message : '') + ' ' + (err && err.stack ? err.stack : '');
+          return str.indexOf('Cannot set property fetch') !== -1 ||
+                 str.indexOf('chrome-extension://') !== -1 ||
+                 str.indexOf('eppiocemhmnlbhjplcgkofciiegomcon') !== -1 ||
+                 str.indexOf('requests.js') !== -1;
+        }
+
+        window.onerror = function(msg, url, line, col, err) {
+          if (isExtensionError(msg, url, err)) {
+            return true; // Stop error from bubbling to console or host
+          }
+        };
+
+        window.addEventListener('error', function(event) {
+          if (event && isExtensionError(event.message, event.filename, event.error)) {
+            if (typeof event.preventDefault === 'function') event.preventDefault();
+            if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+            return true;
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(event) {
+          if (event && isExtensionError('', '', event.reason)) {
+            if (typeof event.preventDefault === 'function') event.preventDefault();
+            if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+          }
+        }, true);
+
+        var _origConsoleError = console.error;
+        console.error = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var joined = args.map(function(a) { return (a && a.stack) ? a.stack : String(a); }).join(' ');
+          if (isExtensionError(joined, '', null)) {
+            return; // Suppress extension error log
+          }
+          return _origConsoleError.apply(console, args);
+        };
+      })();
+    </script>
+    <title>SIPATEN — Aplikasi Pembuatan Konten</title>
+    <meta name="description" content="Satu Sumber Kebijakan, Dua Produk Komunikasi Strategis. Kemenko Polkam." />
+    <meta property="og:title" content="SIPATEN — Aplikasi Pembuatan Konten" />
+    <meta property="og:description" content="Satu Sumber Kebijakan, Dua Produk Komunikasi Strategis. Kemenko Polkam." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
